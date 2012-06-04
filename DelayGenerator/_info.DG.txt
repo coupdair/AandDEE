@@ -1,0 +1,11 @@
+#compile and load
+make clean; make && make upload && make size
+
+#Makefile
+##digital output ON with OUTPUT defined:
+  internal mode: -DOUTPUT
+  external mode: -DEXTERNAL_TRIGGER -DOUTPUT
+##digital output OFF without OUTPUT defined:
+  internal mode: (empty)
+  external mode: -DEXTERNAL_TRIGGER
+
