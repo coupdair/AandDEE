@@ -1,0 +1,12 @@
+AandDEE
+
+Analog and Digital Electronics devices for Experiments (AandDEE) project is both HardWare and SoftWare developments.
+components:
+* a single shield (HardWare) for both DG end DAQ software.
+  the shield is composed of:
+  - 4 digital IO
+  - 2 analog I
+  - 6 LED (could be used for showing what's going on the 4 DIO and 2 AI)
+* Delay Generator (DG) software.
+* DAta AQuisition (DAQ) software.
+
