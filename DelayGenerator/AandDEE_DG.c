@@ -38,13 +38,13 @@
 #define TTL_PORT PORTD
 #define TTL_PIN  PIND
 //Upper Left TTL
-#define TTL_UL PORTD4
+#define TTL_UL PORTD6
 //Upper Right TTL
-#define TTL_UR PORTD6
+#define TTL_UR PORTD4
 //Bottom Left TTL 
-#define TTL_BL PORTD7
+#define TTL_BL PORTD5
 //Bottom Right TTL
-#define TTL_BR PORTD5
+#define TTL_BR PORTD7
 
 //2 analog on single port
 //! \todo analog read for both pin.
@@ -123,12 +123,13 @@ int main(void)
 /**/
 #ifdef EXTERNAL_TRIGGER
   TTL_DDR&=~_BV(TTL_UL);//TTL input
+  TTL_DDR&=~_BV(TTL_BL);//TTL input
 #else
   TTL_DDR|=_BV(TTL_UL);//TTL output
+  TTL_DDR|=_BV(TTL_BL);//TTL output
 #endif
   TTL_DDR|=_BV(TTL_UR);//TTL output
   TTL_DDR|=_BV(TTL_BR);//TTL output
-  TTL_DDR|=_BV(TTL_BL);//TTL output
 /*or for ArduinoUNO* /
 //  TTL_DDR=0b01111111;//BL for AandDEE.shield.v0.0.1 or BR for AandDEE.shield.v0.1.1
   TTL_DDR=0b11111111;//all output
@@ -139,8 +140,8 @@ int main(void)
   LED_DDR|=_BV(LED_BL)|_BV(LED_BR)|_BV(LED_UL)|_BV(LED_UR);//LED output
 
 //mapping
-  int ttl[4]={TTL_UL,TTL_UR,TTL_BL,TTL_BR};
-  int led[6]={LED_UL,LED_UR,LED_BL,LED_BR,LED_AL,LED_AR};
+  int ttl[4]={TTL_UL,TTL_BL,TTL_UR,TTL_BR};
+  int led[6]={LED_UL,LED_BL,LED_UR,LED_BR,LED_AL,LED_AR};
 
 //test
 /** /
@@ -164,11 +165,11 @@ int delay2=delayDown-delay1;//delayDown=delay1+delay2
   {
 #ifdef EXTERNAL_TRIGGER
     //LED ON (i.e. !TTL)
-    LED_PORT|=_BV(LED_UL);
+    LED_PORT|=_BV(LED_BL);
     //wait
-    loop_until_bit_is_set(TTL_PIN,TTL_UL); //wait for PIV synchronization up
+    loop_until_bit_is_set(TTL_PIN,TTL_BL); //wait for PIV synchronization up
     //LED OFF (i.e. !TTL)
-    LED_PORT&=~_BV(LED_UL);
+    LED_PORT&=~_BV(LED_BL);
 #endif //EXTERNAL_TRIGGER
     //ON
     ///TTL
@@ -176,9 +177,9 @@ int delay2=delayDown-delay1;//delayDown=delay1+delay2
 #ifdef OUTPUT
 #ifndef EXTERNAL_TRIGGER
     TTL_PORT|=_BV(TTL_UL);//TTL on
+    TTL_PORT|=_BV(TTL_BL);//TTL on
 #endif //EXTERNAL_TRIGGER
     TTL_PORT|=_BV(TTL_UR);//TTL on
-///    TTL_PORT|=_BV(TTL_BL);//TTL on
     TTL_PORT|=_BV(TTL_BR);//TTL on
 /*or* /
     TTL_PORT|=0b01111111;//TTL on
@@ -189,7 +190,7 @@ int delay2=delayDown-delay1;//delayDown=delay1+delay2
     ///LED
 #ifdef OUTPUT
 #ifdef EXTERNAL_TRIGGER
-    i=1;
+    i=2;
 #else //EXTERNAL_TRIGGER
     i=0;
 #endif //not EXTERNAL_TRIGGER
@@ -199,16 +200,16 @@ int delay2=delayDown-delay1;//delayDown=delay1+delay2
     _delay_ms(delayUp);//delay0
 #ifdef EXTERNAL_TRIGGER
     //wait
-    loop_until_bit_is_clear(TTL_PIN,TTL_UL); //wait for PIV synchronization down
+    loop_until_bit_is_clear(TTL_PIN,TTL_BL); //wait for PIV synchronization down
 #endif //EXTERNAL_TRIGGER
     //OFF
 /**/
 #ifndef EXTERNAL_TRIGGER
     TTL_PORT&=~_BV(TTL_UL);//TTL off
+    TTL_PORT&=~_BV(TTL_BL);//TTL off
 #endif //not EXTERNAL_TRIGGER
 #ifdef OUTPUT
     TTL_PORT&=~_BV(TTL_UR);//TTL off
-///    TTL_PORT&=~_BV(TTL_BL);//TTL off
     TTL_PORT&=~_BV(TTL_BR);//TTL off
 /*or* /
     TTL_PORT&=0b10000000;//TTL off
@@ -220,7 +221,7 @@ int delay2=delayDown-delay1;//delayDown=delay1+delay2
     _delay_ms(delay1);
 #ifdef OUTPUT
 #ifdef EXTERNAL_TRIGGER
-    i=1;
+    i=2;
 #else //EXTERNAL_TRIGGER
     i=0;
 #endif //not EXTERNAL_TRIGGER
