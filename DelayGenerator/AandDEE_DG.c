@@ -27,11 +27,11 @@
 //Bottom Left LED
 #define LED_BL  PORTB4
 //Bottom Right LED
-#define LED_BR  PORTB0
+#define LED_BR  PORTB1
 //Analog Left LED
-#define LED_AL  PORTB1
+#define LED_AL  PORTB3
 //Analog Right LED
-#define LED_AR  PORTB3
+#define LED_AR  PORTB0
 
 //4 TTL on single port
 #define TTL_DDR  DDRD 
@@ -159,17 +159,26 @@ int delayDown=period-delayUp;
 int exposure=150;//MAstPIV:<4Hz
 int delay1=exposure-delayUp;//exposure=delay0+delay1
 int delay2=delayDown-delay1;//delayDown=delay1+delay2
+
+///wait for start trigger on BL
+//LED ON (i.e. !TTL)
+LED_PORT|=_BV(LED_BL);
+//wait
+loop_until_bit_is_set(TTL_PIN,TTL_BL); //wait for start (next burst) synchronization up
+//LED OFF (i.e. !TTL)
+LED_PORT&=~_BV(LED_BL);
+
 //loop
   int i;
   while(1)
   {
 #ifdef EXTERNAL_TRIGGER
     //LED ON (i.e. !TTL)
-    LED_PORT|=_BV(LED_BL);
+    LED_PORT|=_BV(LED_UL);
     //wait
-    loop_until_bit_is_set(TTL_PIN,TTL_BL); //wait for PIV synchronization up
+    loop_until_bit_is_set(TTL_PIN,TTL_UL); //wait for PIV synchronization up
     //LED OFF (i.e. !TTL)
-    LED_PORT&=~_BV(LED_BL);
+    LED_PORT&=~_BV(LED_UL);
 #endif //EXTERNAL_TRIGGER
     //ON
     ///TTL
@@ -200,7 +209,7 @@ int delay2=delayDown-delay1;//delayDown=delay1+delay2
     _delay_ms(delayUp);//delay0
 #ifdef EXTERNAL_TRIGGER
     //wait
-    loop_until_bit_is_clear(TTL_PIN,TTL_BL); //wait for PIV synchronization down
+    loop_until_bit_is_clear(TTL_PIN,TTL_UL); //wait for PIV synchronization down
 #endif //EXTERNAL_TRIGGER
     //OFF
 /**/
