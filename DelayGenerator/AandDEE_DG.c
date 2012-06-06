@@ -122,14 +122,14 @@ int main(void)
 ///TTL
 /**/
 #ifdef EXTERNAL_TRIGGER
-  TTL_DDR&=~_BV(TTL_UL);//TTL input
-  TTL_DDR&=~_BV(TTL_BL);//TTL input
+  TTL_DDR&=~_BV(TTL_UL);//TTL input: PIV 4Hz in
+  TTL_DDR&=~_BV(TTL_BL);//TTL input: burst envelop 0.1 Hz in
 #else
   TTL_DDR|=_BV(TTL_UL);//TTL output
   TTL_DDR|=_BV(TTL_BL);//TTL output
 #endif
-  TTL_DDR|=_BV(TTL_UR);//TTL output
-  TTL_DDR|=_BV(TTL_BR);//TTL output
+  TTL_DDR|=_BV(TTL_UR);//TTL output: matrixi 4Hz out
+  TTL_DDR|=_BV(TTL_BR);//TTL output: camera trigging burst out
 /*or for ArduinoUNO* /
 //  TTL_DDR=0b01111111;//BL for AandDEE.shield.v0.0.1 or BR for AandDEE.shield.v0.1.1
   TTL_DDR=0b11111111;//all output
@@ -182,28 +182,18 @@ LED_PORT&=~_BV(LED_BL);
 #endif //EXTERNAL_TRIGGER
     //ON
     ///TTL
-/**/
+    TTL_PORT|=_BV(TTL_BR);//TTL on camera
 #ifdef OUTPUT
 #ifndef EXTERNAL_TRIGGER
     TTL_PORT|=_BV(TTL_UL);//TTL on
     TTL_PORT|=_BV(TTL_BL);//TTL on
 #endif //EXTERNAL_TRIGGER
-    TTL_PORT|=_BV(TTL_UR);//TTL on
-    TTL_PORT|=_BV(TTL_BR);//TTL on
-/*or* /
-    TTL_PORT|=0b01111111;//TTL on
-/*or* /
-    for(i=0;i<4;++i) TTL_PORT|=_BV(ttl[i]);//TTL on
-/**/
+    TTL_PORT|=_BV(TTL_UR);//TTL on matrixi
 #endif //OUTPUT
     ///LED
+    LED_PORT|=_BV(LED_BR);//LED on camera
 #ifdef OUTPUT
-#ifdef EXTERNAL_TRIGGER
-    i=2;
-#else //EXTERNAL_TRIGGER
-    i=0;
-#endif //not EXTERNAL_TRIGGER
-    for(;i<4;++i) LED_PORT|=_BV(led[i]);//LED on
+    LED_PORT|=_BV(LED_UR);//LED on matrixi
 #endif //not OUTPUT
     //delay (i.e. TTL up time)
     _delay_ms(delayUp);//delay0
@@ -212,29 +202,19 @@ LED_PORT&=~_BV(LED_BL);
     loop_until_bit_is_clear(TTL_PIN,TTL_UL); //wait for PIV synchronization down
 #endif //EXTERNAL_TRIGGER
     //OFF
-/**/
 #ifndef EXTERNAL_TRIGGER
     TTL_PORT&=~_BV(TTL_UL);//TTL off
     TTL_PORT&=~_BV(TTL_BL);//TTL off
 #endif //not EXTERNAL_TRIGGER
+    TTL_PORT&=~_BV(TTL_BR);//TTL off camera
 #ifdef OUTPUT
-    TTL_PORT&=~_BV(TTL_UR);//TTL off
-    TTL_PORT&=~_BV(TTL_BR);//TTL off
-/*or* /
-    TTL_PORT&=0b10000000;//TTL off
-/*or* /
-    for(i=0;i<4;++i) TTL_PORT&=~_BV(ttl[i]);//TTL off
-/**/
+    TTL_PORT&=~_BV(TTL_UR);//TTL off matrixi
 #endif //OUTPUT
     //delay (i.e. LED exposure time)
     _delay_ms(delay1);
+    LED_PORT&=~_BV(LED_BR);//LED on camera
 #ifdef OUTPUT
-#ifdef EXTERNAL_TRIGGER
-    i=2;
-#else //EXTERNAL_TRIGGER
-    i=0;
-#endif //not EXTERNAL_TRIGGER
-    for(;i<4;++i) LED_PORT&=~_BV(led[i]);//LED off
+    LED_PORT&=~_BV(LED_UR);//LED on matrixi
 #endif //OUTPUT
 #ifndef EXTERNAL_TRIGGER
     //delay (i.e. TTL down time)
