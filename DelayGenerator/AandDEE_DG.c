@@ -172,22 +172,16 @@ LED_PORT&=~_BV(LED_BL);
   int i;
   while(1)
   {
-#ifdef EXTERNAL_TRIGGER
     //LED ON (i.e. !TTL)
     LED_PORT|=_BV(LED_UL);
-    //wait
+    //wait external PIV trigger
     loop_until_bit_is_set(TTL_PIN,TTL_UL); //wait for PIV synchronization up
     //LED OFF (i.e. !TTL)
     LED_PORT&=~_BV(LED_UL);
-#endif //EXTERNAL_TRIGGER
     //ON
     ///TTL
     TTL_PORT|=_BV(TTL_BR);//TTL on camera
 #ifdef OUTPUT
-#ifndef EXTERNAL_TRIGGER
-    TTL_PORT|=_BV(TTL_UL);//TTL on
-    TTL_PORT|=_BV(TTL_BL);//TTL on
-#endif //EXTERNAL_TRIGGER
     TTL_PORT|=_BV(TTL_UR);//TTL on matrixi
 #endif //OUTPUT
     ///LED
@@ -197,15 +191,11 @@ LED_PORT&=~_BV(LED_BL);
 #endif //not OUTPUT
     //delay (i.e. TTL up time)
     _delay_ms(delayUp);//delay0
-#ifdef EXTERNAL_TRIGGER
-    //wait
+    //wait external PIV trigger
     loop_until_bit_is_clear(TTL_PIN,TTL_UL); //wait for PIV synchronization down
-#endif //EXTERNAL_TRIGGER
     //OFF
-#ifndef EXTERNAL_TRIGGER
     TTL_PORT&=~_BV(TTL_UL);//TTL off
     TTL_PORT&=~_BV(TTL_BL);//TTL off
-#endif //not EXTERNAL_TRIGGER
     TTL_PORT&=~_BV(TTL_BR);//TTL off camera
 #ifdef OUTPUT
     TTL_PORT&=~_BV(TTL_UR);//TTL off matrixi
@@ -216,10 +206,6 @@ LED_PORT&=~_BV(LED_BL);
 #ifdef OUTPUT
     LED_PORT&=~_BV(LED_UR);//LED on matrixi
 #endif //OUTPUT
-#ifndef EXTERNAL_TRIGGER
-    //delay (i.e. TTL down time)
-    _delay_ms(delay2);
-#endif
   }//infinite loop
   return (0);
 }
