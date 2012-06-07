@@ -133,15 +133,34 @@ void testLEDmap(int repeat,int delay,int *led/*[6]*/,int *ttl/*[4]*/)
   }//repeat loop
 }//testLEDmap
 
-void wait_TTL(char ttl,char led)
+//wait_TTL(TTL_PIV,LED_PIV);
+inline void wait_TTL(char ttl,char led)
 {
-///wait for start trigger on TTL burst
+///wait for start trigger on TTL
   //LED ON (i.e. !TTL)
   LED_PORT|=_BV(led);
   //wait
-  loop_until_bit_is_set(TTL_PIN,ttl); //wait for start (next burst) synchronization up
+  loop_until_bit_is_set(TTL_PIN,ttl); //wait for TTL synchronization up
   //LED OFF (i.e. !TTL)
   LED_PORT&=~_BV(led);
+}
+
+/*
+//wait_TTL_(TTL_PIV,LED_PIV);
+#define wait_TTL_(ttl,led) \
+{ \
+  LED_PORT|=_BV(led); \
+  loop_until_bit_is_set(TTL_PIN,ttl); \
+  LED_PORT&=~_BV(led); \
+}
+*/
+
+//wait_TTL_(PIV);
+#define wait_TTL_(pin) \
+{ \
+  LED_PORT|=_BV(LED_##pin); \
+  loop_until_bit_is_set(TTL_PIN,TTL_##pin); \
+  LED_PORT&=~_BV(LED_##pin); \
 }
 
 //
@@ -177,14 +196,16 @@ int delay1=exposure-delayUp;//exposure=delay0+delay1
 int delay2=delayDown-delay1;//delayDown=delay1+delay2
 
 ///wait for start trigger on TTL burst
-wait_TTL(TTL_burst,LED_burst);
+//wait_TTL(TTL_burst,LED_burst);
+wait_TTL_(burst);
 
 //loop
   int i;
   while(1)
   {
     //wait external PIV trigger
-    wait_TTL(TTL_PIV,LED_PIV);
+    //wait_TTL(TTL_PIV,LED_PIV);
+    wait_TTL_(PIV);
     //ON
     ///TTL
     TTL_PORT|=_BV(TTL_camera);//TTL on camera
