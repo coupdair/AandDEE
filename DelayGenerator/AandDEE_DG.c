@@ -51,6 +51,24 @@
 
 #endif
 
+//TTL burst (in)
+#define TTL_burst TTL_BL
+//TTL PIV   (in)
+#define TTL_PIV   TTL_UL
+//TTL camera  (out)
+#define TTL_camera  TTL_BR
+//TTL matrixi (out)
+#define TTL_matrixi TTL_UR
+
+//LED burst (in)
+#define LED_burst LED_BL
+//LED PIV   (in)
+#define LED_PIV   LED_UL
+//LED camera  (out)
+#define LED_camera  LED_BR
+//LED matrixi (out)
+#define LED_matrixi LED_UR
+
 //! 
 /**
  * 
@@ -120,31 +138,18 @@ int main(void)
 {
 //initialisation
 ///TTL
-/**/
-#ifdef EXTERNAL_TRIGGER
   TTL_DDR&=~_BV(TTL_UL);//TTL input: PIV 4Hz in
   TTL_DDR&=~_BV(TTL_BL);//TTL input: burst envelop 0.1 Hz in
-#else
-  TTL_DDR|=_BV(TTL_UL);//TTL output
-  TTL_DDR|=_BV(TTL_BL);//TTL output
-#endif
   TTL_DDR|=_BV(TTL_UR);//TTL output: matrixi 4Hz out
   TTL_DDR|=_BV(TTL_BR);//TTL output: camera trigging burst out
-/*or for ArduinoUNO* /
-//  TTL_DDR=0b01111111;//BL for AandDEE.shield.v0.0.1 or BR for AandDEE.shield.v0.1.1
-  TTL_DDR=0b11111111;//all output
-/*but NOT*/
-  //TTL_DDR=255;//TTL output BAD
-  //TTL_DDR&=~_BV(TTL_BL);//TTL input BAD
 ///LED
   LED_DDR|=_BV(LED_BL)|_BV(LED_BR)|_BV(LED_UL)|_BV(LED_UR);//LED output
 
+/** /
 //mapping
   int ttl[4]={TTL_UL,TTL_BL,TTL_UR,TTL_BR};
   int led[6]={LED_UL,LED_BL,LED_UR,LED_BR,LED_AL,LED_AR};
-
 //test
-/** /
   testAllLED(2,500,led);
   testLEDmap(2,500,led,ttl);
   testAllLED(1,1000,led);
@@ -160,51 +165,50 @@ int exposure=150;//MAstPIV:<4Hz
 int delay1=exposure-delayUp;//exposure=delay0+delay1
 int delay2=delayDown-delay1;//delayDown=delay1+delay2
 
-///wait for start trigger on BL
+///wait for start trigger on TTL burst
 //LED ON (i.e. !TTL)
-LED_PORT|=_BV(LED_BL);
+LED_PORT|=_BV(LED_burst);
 //wait
-loop_until_bit_is_set(TTL_PIN,TTL_BL); //wait for start (next burst) synchronization up
+loop_until_bit_is_set(TTL_PIN,TTL_burst); //wait for start (next burst) synchronization up
 //LED OFF (i.e. !TTL)
-LED_PORT&=~_BV(LED_BL);
+LED_PORT&=~_BV(LED_burst);
 
 //loop
   int i;
   while(1)
   {
     //LED ON (i.e. !TTL)
-    LED_PORT|=_BV(LED_UL);
+    LED_PORT|=_BV(LED_PIV);
     //wait external PIV trigger
-    loop_until_bit_is_set(TTL_PIN,TTL_UL); //wait for PIV synchronization up
+    loop_until_bit_is_set(TTL_PIN,TTL_PIV); //wait for PIV synchronization up
     //LED OFF (i.e. !TTL)
-    LED_PORT&=~_BV(LED_UL);
+    LED_PORT&=~_BV(LED_PIV);
     //ON
     ///TTL
-    TTL_PORT|=_BV(TTL_BR);//TTL on camera
+    TTL_PORT|=_BV(TTL_camera);//TTL on camera
 #ifdef OUTPUT
-    TTL_PORT|=_BV(TTL_UR);//TTL on matrixi
+    TTL_PORT|=_BV(TTL_matrixi);//TTL on matrixi
 #endif //OUTPUT
     ///LED
-    LED_PORT|=_BV(LED_BR);//LED on camera
+    LED_PORT|=_BV(LED_camera);//LED on camera
 #ifdef OUTPUT
-    LED_PORT|=_BV(LED_UR);//LED on matrixi
+    LED_PORT|=_BV(LED_matrixi);//LED on matrixi
 #endif //not OUTPUT
     //delay (i.e. TTL up time)
     _delay_ms(delayUp);//delay0
     //wait external PIV trigger
-    loop_until_bit_is_clear(TTL_PIN,TTL_UL); //wait for PIV synchronization down
+    loop_until_bit_is_clear(TTL_PIN,TTL_PIV); //wait for PIV synchronization down
     //OFF
-    TTL_PORT&=~_BV(TTL_UL);//TTL off
-    TTL_PORT&=~_BV(TTL_BL);//TTL off
-    TTL_PORT&=~_BV(TTL_BR);//TTL off camera
+    TTL_PORT&=~_BV(TTL_PIV);//TTL off
+    TTL_PORT&=~_BV(TTL_camera);//TTL off camera
 #ifdef OUTPUT
-    TTL_PORT&=~_BV(TTL_UR);//TTL off matrixi
+    TTL_PORT&=~_BV(TTL_matrixi);//TTL off matrixi
 #endif //OUTPUT
     //delay (i.e. LED exposure time)
     _delay_ms(delay1);
-    LED_PORT&=~_BV(LED_BR);//LED on camera
+    LED_PORT&=~_BV(LED_camera);//LED on camera
 #ifdef OUTPUT
-    LED_PORT&=~_BV(LED_UR);//LED on matrixi
+    LED_PORT&=~_BV(LED_matrixi);//LED on matrixi
 #endif //OUTPUT
   }//infinite loop
   return (0);
