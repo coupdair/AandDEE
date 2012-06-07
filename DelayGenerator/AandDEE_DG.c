@@ -185,7 +185,6 @@ inline void record_image(const int delayUp,const int delay1)
     //wait external PIV trigger
     loop_until_bit_is_clear(TTL_PIN,TTL_PIV); //wait for PIV synchronization down
     //OFF
-    TTL_PORT&=~_BV(TTL_PIV);//TTL off
     TTL_PORT&=~_BV(TTL_camera);//TTL off camera
 #ifdef BURST
     TTL_PORT&=~_BV(TTL_matrixi);//TTL off matrixi
@@ -196,6 +195,28 @@ inline void record_image(const int delayUp,const int delay1)
 #ifdef BURST
     LED_PORT&=~_BV(LED_matrixi);//LED on matrixi
 #endif //BURST
+}//record_image
+
+//!
+/**
+ * increment matrixi
+**/
+inline void do_matrixi(const int delayUp,const int delay1)
+{
+    //ON
+    ///TTL
+    TTL_PORT|=_BV(TTL_matrixi);//TTL on matrixi
+    ///LED
+    LED_PORT|=_BV(LED_matrixi);//LED on matrixi
+    //delay (i.e. TTL up time)
+    _delay_ms(delayUp);//delay0
+    //wait external PIV trigger
+    loop_until_bit_is_clear(TTL_PIN,TTL_PIV); //wait for PIV synchronization down
+    //OFF
+    TTL_PORT&=~_BV(TTL_matrixi);//TTL off matrixi
+    //delay (i.e. LED exposure time)
+    _delay_ms(delay1);
+    LED_PORT&=~_BV(LED_matrixi);//LED on matrixi
 }//record_image
 
 //
@@ -240,8 +261,15 @@ wait_TTL_(burst);
     wait_TTL_(burst);
     ///delay between valves and measurement
     //set by burst system (i.e. ArduinoMega1280)
+    ///wait for start trigger on TTL PIV
     wait_TTL_(PIV);
+    ///record a first selection of images
     record_image(delayUp,delay1);
+    for(i=1;i<10;++i) {wait_TTL_(PIV);record_image(delayUp,delay1);}
+    ///skip recording of images
+    for(i=0;i<10;++i) {wait_TTL_(PIV);do_matrixi(delayUp,delay1);}
+    ///record a first selection of images
+    for(i=0;i<10;++i) {wait_TTL_(PIV);record_image(delayUp,delay1);}
 #else //!BURST == CONTINUOUS
     wait_TTL_(PIV);
     record_image(delayUp,delay1);
