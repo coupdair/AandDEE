@@ -5,7 +5,7 @@ CC = avr-gcc
 CPPFLAGS = -mmcu=$(MCU)
 #CFLAGS = -Os -g -Wall -I. -DF_CPU=16000000 -DMCU_$(MCU)
 #CFLAGS = -Os -g -Wall -I. -DF_CPU=16000000 -DMCU_$(MCU) -DEXTERNAL_TRIGGER
-CFLAGS = -Os -g -Wall -I. -DF_CPU=16000000 -DMCU_$(MCU) -DEXTERNAL_TRIGGER -DOUTPUT
+CFLAGS = -Os -g -Wall -I. -DF_CPU=16000000 -DMCU_$(MCU) -DEXTERNAL_TRIGGER -DBURST
 LDFLAGS = -g -mmcu=$(MCU) -lm -Wl,--gc-sections -Os
 PGMER = -c arduino -b 115200 -P /dev/ttyACM0
 #DUDE = /usr/bin/avrdude -V -p $(MCU)

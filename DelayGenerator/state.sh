@@ -1,16 +1,16 @@
 #!/bin/bash
 
-exit='out' 
+exit='burst' 
 exit=$1 
 
-if [[ $exit == out ]]
+if [[ $exit == burst ]]
 then
-echo 'DO Master'
+echo 'Master as CALIBRATION'
 #wDo
 cat Makefile.template > Makefile
 else
-echo 'Init Master'
-cat Makefile.template| sed 's/-DOUTPUT//' > Makefile
+echo 'Master as BURST'
+cat Makefile.template| sed 's/-DBURST//' > Makefile
 fi
 
 sudo make clean; sudo make && sudo make upload && make size
