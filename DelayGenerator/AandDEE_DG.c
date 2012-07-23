@@ -17,37 +17,30 @@
 
 #ifdef MCU_atmega328p
  
-//6 LED on single port
+//4 LED on single port (AandDEE.v0.0.1)
 #define LED_DDR  DDRB
 #define LED_PORT PORTB
 //Upper Left LED
-#define LED_UL  PORTB5
+#define LED_UL  PORTB2
 //Upper Right LED
-#define LED_UR  PORTB2
+#define LED_UR  PORTB1
 //Bottom Left LED
-#define LED_BL  PORTB4
+#define LED_BL  PORTB0
 //Bottom Right LED
-#define LED_BR  PORTB1
-//Analog Left LED
-#define LED_AL  PORTB3
-//Analog Right LED
-#define LED_AR  PORTB0
+#define LED_BR  PORTB3
 
-//4 TTL on single port
+//4 TTL on single port (AandDEE.v0.0.1)
 #define TTL_DDR  DDRD 
 #define TTL_PORT PORTD
 #define TTL_PIN  PIND
 //Upper Left TTL
 #define TTL_UL PORTD6
 //Upper Right TTL
-#define TTL_UR PORTD4
+#define TTL_UR PORTD5
 //Bottom Left TTL 
-#define TTL_BL PORTD5
+#define TTL_BL PORTD7
 //Bottom Right TTL
-#define TTL_BR PORTD7
-
-//2 analog on single port
-//! \todo analog read for both pin.
+#define TTL_BR PORTD4
 
 #endif
 
@@ -185,9 +178,10 @@ int main(void)
 
 /**/
 //mapping
-  int ttl[4]={TTL_UL,TTL_BL,TTL_UR,TTL_BR};
-  int led[6]={LED_UL,LED_BL,LED_UR,LED_BR,LED_AL,LED_AR};
+  int ttl[4]={TTL_UL,TTL_UR,TTL_BL,TTL_BR};
+  int led[6]={LED_UL,LED_UR,LED_BL,LED_BR};//,LED_AL,LED_AR};
 //test
+  LED_DDR=255;//all LED output
   testAllLED(2,500,led);
   testLEDmap(2,500,led,ttl);
   testAllLED(1,1000,led);
