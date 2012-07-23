@@ -51,23 +51,13 @@
 
 #endif
 
-//TTL burst (in)
-#define TTL_burst TTL_BL
-//TTL PIV   (in)
-#define TTL_PIV   TTL_UL
 //TTL camera  (out)
-#define TTL_camera  TTL_BR
-//TTL matrixi (out)
-#define TTL_matrixi TTL_UR
+#define TTL_camera  TTL_UL
 
-//LED burst (in)
-#define LED_burst LED_BL
-//LED PIV   (in)
-#define LED_PIV   LED_UL
 //LED camera  (out)
-#define LED_camera  LED_BR
-//LED matrixi (out)
-#define LED_matrixi LED_UR
+#define LED_camera  LED_UL
+//LED wait next reset  (out)
+#define LED_wait  LED_BR
 
 //! 
 /**
@@ -165,58 +155,22 @@ inline void wait_TTL(char ttl,char led)
 
 //!
 /**
- * record a single image (with matrixi on if BURST defined)
+ * record a single image (with both TTL and LED)
 **/
 inline void record_image(const int delayUp,const int delay1)
 {
     //ON
     ///TTL
     TTL_PORT|=_BV(TTL_camera);//TTL on camera
-#ifdef BURST
-    TTL_PORT|=_BV(TTL_matrixi);//TTL on matrixi
-#endif //BURST
     ///LED
     LED_PORT|=_BV(LED_camera);//LED on camera
-#ifdef BURST
-    LED_PORT|=_BV(LED_matrixi);//LED on matrixi
-#endif //not BURST
     //delay (i.e. TTL up time)
     _delay_ms(delayUp);//delay0
-    //wait external PIV trigger
-    loop_until_bit_is_clear(TTL_PIN,TTL_PIV); //wait for PIV synchronization down
     //OFF
     TTL_PORT&=~_BV(TTL_camera);//TTL off camera
-#ifdef BURST
-    TTL_PORT&=~_BV(TTL_matrixi);//TTL off matrixi
-#endif //BURST
     //delay (i.e. LED exposure time)
     _delay_ms(delay1);
-    LED_PORT&=~_BV(LED_camera);//LED on camera
-#ifdef BURST
-    LED_PORT&=~_BV(LED_matrixi);//LED on matrixi
-#endif //BURST
-}//record_image
-
-//!
-/**
- * increment matrixi
-**/
-inline void do_matrixi(const int delayUp,const int delay1)
-{
-    //ON
-    ///TTL
-    TTL_PORT|=_BV(TTL_matrixi);//TTL on matrixi
-    ///LED
-    LED_PORT|=_BV(LED_matrixi);//LED on matrixi
-    //delay (i.e. TTL up time)
-    _delay_ms(delayUp);//delay0
-    //wait external PIV trigger
-    loop_until_bit_is_clear(TTL_PIN,TTL_PIV); //wait for PIV synchronization down
-    //OFF
-    TTL_PORT&=~_BV(TTL_matrixi);//TTL off matrixi
-    //delay (i.e. LED exposure time)
-    _delay_ms(delay1);
-    LED_PORT&=~_BV(LED_matrixi);//LED on matrixi
+    LED_PORT&=~_BV(LED_camera);//LED off camera
 }//record_image
 
 //
@@ -224,14 +178,12 @@ int main(void)
 {
 //initialisation
 ///TTL
-  TTL_DDR&=~_BV(TTL_UL);//TTL input: PIV 4Hz in
-  TTL_DDR&=~_BV(TTL_BL);//TTL input: burst envelop 0.1 Hz in
-  TTL_DDR|=_BV(TTL_UR);//TTL output: matrixi 4Hz out
-  TTL_DDR|=_BV(TTL_BR);//TTL output: camera trigging burst out
+//  TTL_DDR&=~_BV(TTL_UL);//TTL input
+  TTL_DDR|=_BV(TTL_camera);//TTL output: sync for camera (FlowMaster, ImagerIntense, Phantom, ...)
 ///LED
-  LED_DDR|=_BV(LED_BL)|_BV(LED_BR)|_BV(LED_UL)|_BV(LED_UR);//LED output
+  LED_DDR|=_BV(LED_camera)|_BV(LED_wait);//|_BV(LED_UL)|_BV(LED_UR);//LED output: TTL_UL and wait for reset
 
-/** /
+/**/
 //mapping
   int ttl[4]={TTL_UL,TTL_BL,TTL_UR,TTL_BR};
   int led[6]={LED_UL,LED_BL,LED_UR,LED_BR,LED_AL,LED_AR};
@@ -241,41 +193,25 @@ int main(void)
   testAllLED(1,1000,led);
 /**/
 
+//initialisation
+  LED_PORT=0;//all LED off
+
 //internal delay generator
 ///TTL
-int delayUp=10;//delay0 MAstPIV:10ms
+int period=1000;//period=delay0+delay1+delay2
+int delayUp=10;//delay0
+int delayDown=period-delayUp;
 ///LED
-int exposure=150;//MAstPIV:<4Hz (i.e. 250 ms)
+int exposure=250;
 int delay1=exposure-delayUp;//exposure=delay0+delay1
+int delay2=delayDown-delay1;//delayDown=delay1+delay2
 
-///wait for start trigger on TTL burst
-//wait_TTL(TTL_burst,LED_burst);
-wait_TTL_(burst);
-
-//loop
+//sequence
   int i;
-  while(1)
-  {
-#ifdef BURST
-    ///wait for start trigger on TTL burst
-    wait_TTL_(burst);
-    ///delay between valves and measurement
-    //set by burst system (i.e. ArduinoMega1280)
-    ///wait for start trigger on TTL PIV
-    wait_TTL_(PIV);
-    ///record a first selection of images
-    record_image(delayUp,delay1);
-    for(i=1;i<10;++i) {wait_TTL_(PIV);record_image(delayUp,delay1);}
-    ///skip recording of images
-    for(i=0;i<10;++i) {wait_TTL_(PIV);do_matrixi(delayUp,delay1);}
-    ///record a first selection of images
-    for(i=0;i<10;++i) {wait_TTL_(PIV);record_image(delayUp,delay1);}
-#else //!BURST == CONTINUOUS
-    wait_TTL_(PIV);
-    record_image(delayUp,delay1);
-#endif //!BURST
-
-  }//infinite loop
+  for(i=0;i<10;++i) {record_image(delayUp,delay1);_delay_ms(delay2);}
+  LED_PORT|=_BV(LED_wait);//LED on wait
+//loop
+  while(1){}//infinite loop
   return (0);
 }
 
