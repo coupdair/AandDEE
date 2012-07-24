@@ -176,7 +176,7 @@ int main(void)
 ///LED
   LED_DDR|=_BV(LED_camera)|_BV(LED_wait);//|_BV(LED_UL)|_BV(LED_UR);//LED output: TTL_UL and wait for reset
 
-/**/
+/** /
 //mapping
   int ttl[4]={TTL_UL,TTL_UR,TTL_BL,TTL_BR};
   int led[6]={LED_UL,LED_UR,LED_BL,LED_BR};//,LED_AL,LED_AR};
