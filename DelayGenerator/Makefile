@@ -5,7 +5,7 @@ CC = avr-gcc
 CPPFLAGS = -mmcu=$(MCU)
 CFLAGS = -Os -g -Wall -I. -DF_CPU=16000000 -DMCU_$(MCU)
 LDFLAGS = -g -mmcu=$(MCU) -lm -Wl,--gc-sections -Os
-PGMER = -c arduino -b 115200 -P /dev/ttyACM0
+PGMER = -c arduino -b 115200 -P /dev/ttyACM1
 #DUDE = /usr/bin/avrdude -V -p $(MCU)
 DUDE = ./avrdude-5.10/avrdude -C ./avrdude-5.10/avrdude.conf -p $(MCU)
 
