@@ -133,13 +133,26 @@ int main(void)
 
 //3 bit wheel system test program
   LED_PORT=0;//all LED off
-
 //loop
   while(1)
   {
     set_LED_for_bit(BIT_0,LED_UL);
     set_LED_for_bit(BIT_1,LED_UR);
     set_LED_for_bit(BIT_2,LED_BL);
+/*
+code
+ i bin led
+ 0 000 111
+ 1 100 011
+ 2 010 101
+ 3 110 001
+ 4 001 110
+ 5 101 010
+ 6 011 100
+*/
+    delay_ms(1234);
+    //all LED on
+    testAllLED(1,500,led);
   }//infinite loop
   return (0);
 }
