@@ -122,8 +122,8 @@ int main(void)
 //test
   LED_DDR=255;//all LED output
   testAllLED(2,500,led);
-  testLEDmap(2,500,led);
-  testAllLED(1,1000,led);
+//  testLEDmap(2,500,led);
+//  testAllLED(1,1000,led);
 /**/
 
 //3 bit wheel system test program
@@ -132,10 +132,7 @@ int main(void)
 //loop
   while(1)
   {
-    loop_until_bit_is_set(BIT_PIN,BIT_0);
-    LED_PORT|=_BV(LED_UL);
-    loop_until_bit_is_clear(BIT_PIN,BIT_0); 
-    LED_PORT&=~_BV(LED_UL);
+    if(bit_is_set(BIT_PIN,BIT_0)) LED_PORT|=_BV(LED_UL); else LED_PORT&=~_BV(LED_UL);
   }//infinite loop
   return (0);
 }
