@@ -115,7 +115,7 @@ int main(void)
 {
 //initialisation
 ///BIT
-  BIT_DDR&=~_BV(BIT_0);//as input
+  BIT_DDR&=~_BV(BIT_0);//as input (connected to ground or free: seems strange/random behaviour)
   BIT_DDR&=~_BV(BIT_1);//as input
   BIT_DDR&=~_BV(BIT_2);//as input
 ///LED
@@ -133,6 +133,7 @@ int main(void)
 
 //3 bit wheel system test program
   LED_PORT=0;//all LED off
+  int delay=321;
 //loop
   while(1)
   {
@@ -151,6 +152,11 @@ code
  6 011 100
 */
     delay_ms(1234);
+    //enlight BR LED
+    LED_PORT|=_BV(LED_BR);
+    delay=_SFR_BYTE(BIT_PIN)&0xb11100000;//&0xb00000111;
+    delay_ms(delay*100);
+    LED_PORT&=~_BV(LED_BR);
     //all LED on
     testAllLED(1,500,led);
   }//infinite loop
