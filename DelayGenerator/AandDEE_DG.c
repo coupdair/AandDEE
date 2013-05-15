@@ -32,6 +32,7 @@
 //3 bit wheel system
 #define BIT_DDR  DDRB
 #define BIT_PORT PORTB
+#define BIT_PIN  PINB
 //Upper Left LED
 #define BIT_0  PORTB5
 #define BIT_1  PORTB4
@@ -108,8 +109,10 @@ void testLEDmap(int repeat,int delay,int *led/*[4]*/)
 int main(void)
 {
 //initialisation
-///TTL
-//  BIT_DDR&=~_BV(TTL_UL);//as input
+///BIT
+  BIT_DDR&=~_BV(BIT_0);//as input
+  BIT_DDR&=~_BV(BIT_1);//as input
+  BIT_DDR&=~_BV(BIT_2);//as input
 ///LED
   LED_DDR|=_BV(LED_BL)|_BV(LED_BR)|_BV(LED_UL)|_BV(LED_UR);//LED output
 
@@ -129,7 +132,10 @@ int main(void)
 //loop
   while(1)
   {
-    testLEDmap(1,250,led);
+    loop_until_bit_is_set(BIT_PIN,BIT_0);
+    LED_PORT|=_BV(LED_UL);
+    loop_until_bit_is_clear(BIT_PIN,BIT_0); 
+    LED_PORT&=~_BV(LED_UL);
   }//infinite loop
   return (0);
 }
