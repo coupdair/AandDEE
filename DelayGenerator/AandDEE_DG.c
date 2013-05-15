@@ -105,6 +105,11 @@ void testLEDmap(int repeat,int delay,int *led/*[4]*/)
   }//repeat loop
 }//testLEDmap
 
+inline void set_LED_for_bit(int bit,int led)
+{
+  if(bit_is_set(BIT_PIN,bit)) LED_PORT|=_BV(led); else LED_PORT&=~_BV(led);
+}
+
 //
 int main(void)
 {
@@ -132,7 +137,9 @@ int main(void)
 //loop
   while(1)
   {
-    if(bit_is_set(BIT_PIN,BIT_0)) LED_PORT|=_BV(LED_UL); else LED_PORT&=~_BV(LED_UL);
+    set_LED_for_bit(BIT_0,LED_UL);
+    set_LED_for_bit(BIT_1,LED_UR);
+    set_LED_for_bit(BIT_2,LED_BL);
   }//infinite loop
   return (0);
 }
