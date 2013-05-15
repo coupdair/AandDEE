@@ -52,6 +52,20 @@
 //LED wait next reset  (out)
 #define LED_wait  LED_BR
 
+//"Error 1 __builtin_avr_delay_cycles expects an integer constant. "
+
+//! delay_ms instead of _delay_ms as internal implementation has changed in AVR-Libc 1.7.1 (not precise as old _delay_ms was not, ? new one)
+void delay_ms(uint16_t count)
+{
+  while(count--) _delay_ms(1);
+}
+
+//! delay_us instead of _delay_us as internal implementation has changed in AVR-Libc 1.7.1 (not precise as _delay_us was not, ? new one)
+void delay_us(uint16_t count)
+{
+  while(count--) _delay_us(1);
+}
+
 //! 
 /**
  * 
@@ -68,11 +82,11 @@ void testAllLED(int repeat,int delay,int *led/*[6]*/)
     //LED on
     for(i=0;i<6;++i) LED_PORT|=_BV(led[i]);
     //wait a while
-    _delay_ms(delay);
+    delay_ms(delay);
     //LED off
     for(i=0;i<6;++i) LED_PORT&=~_BV(led[i]);
     //wait a while
-    _delay_ms(delay);
+    delay_ms(delay);
   }//for loop test
 }//testAllLED
 
@@ -95,24 +109,24 @@ void testLEDmap(int repeat,int delay,int *led/*[6]*/,int *ttl/*[4]*/)
       //ON
       TTL_PORT|=_BV(ttl[i]);//TTL up
       LED_PORT|=_BV(led[i]);//LED on
-      _delay_ms(delay);
+      delay_ms(delay);
       //OFF
       TTL_PORT&=~_BV(ttl[i]);//TTL down
       LED_PORT&=~_BV(led[i]);//LED off
-      _delay_ms(delay);
+      delay_ms(delay);
     }//digital loop
-    _delay_ms(delay);
+    delay_ms(delay);
     //analog LED
     for(i=4;i<6;++i)
     {
       //ON
       LED_PORT|=_BV(led[i]);//LED on
-      _delay_ms(delay);
+      delay_ms(delay);
       //OFF
       LED_PORT&=~_BV(led[i]);//LED off
-      _delay_ms(delay);
+      delay_ms(delay);
     }//analog loop
-    _delay_ms(delay);
+    delay_ms(delay);
   }//repeat loop
 }//testLEDmap
 
@@ -158,11 +172,11 @@ inline void record_image(const int delayUp,const int delay1)
     ///LED
     LED_PORT|=_BV(LED_camera);//LED on camera
     //delay (i.e. TTL up time)
-    _delay_ms(delayUp);//delay0
+    delay_ms(delayUp);//delay0
     //OFF
     TTL_PORT&=~_BV(TTL_camera);//TTL off camera
     //delay (i.e. LED exposure time)
-    _delay_ms(delay1);
+    delay_ms(delay1);
     LED_PORT&=~_BV(LED_camera);//LED off camera
 }//record_image
 
@@ -192,17 +206,17 @@ int main(void)
 
 //internal delay generator
 ///TTL
-int period=1000;//period=delay0+delay1+delay2
-int delayUp=10;//delay0
-int delayDown=period-delayUp;
+const int period=1000;//period=delay0+delay1+delay2
+const int delayUp=10;//delay0
+const int delayDown=period-delayUp;
 ///LED
-int exposure=250;
-int delay1=exposure-delayUp;//exposure=delay0+delay1
-int delay2=delayDown-delay1;//delayDown=delay1+delay2
+const int exposure=250;
+const int delay1=exposure-delayUp;//exposure=delay0+delay1
+const int delay2=delayDown-delay1;//delayDown=delay1+delay2
 
 //sequence
   int i;
-  for(i=0;i<10;++i) {record_image(delayUp,delay1);_delay_ms(delay2);}
+  for(i=0;i<10;++i) {record_image(delayUp,delay1);delay_ms(delay2);}
   LED_PORT|=_BV(LED_wait);//LED on wait
 //loop
   while(1){}//infinite loop
