@@ -18,16 +18,16 @@
 #ifdef MCU_atmega328p
  
 //4 LED on single port (AandDEE.v0.0.1)
-#define LED_DDR  DDRB
-#define LED_PORT PORTB
+#define LED_DDR  DDRD
+#define LED_PORT PORTD
 //Upper Left LED
-#define LED_UL  PORTB2
+#define LED_UL  PORTD2
 //Upper Right LED
-#define LED_UR  PORTB1
+#define LED_UR  PORTD1
 //Bottom Left LED
-#define LED_BL  PORTB0
+#define LED_BL  PORTD0
 //Bottom Right LED
-#define LED_BR  PORTB3
+#define LED_BR  PORTD3
 
 //3 bit wheel system
 #define BIT_DDR  DDRB
