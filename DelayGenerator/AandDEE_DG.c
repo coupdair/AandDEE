@@ -29,28 +29,15 @@
 //Bottom Right LED
 #define LED_BR  PORTB3
 
-//4 TTL on single port (AandDEE.v0.0.1)
-#define TTL_DDR  DDRD 
-#define TTL_PORT PORTD
-#define TTL_PIN  PIND
-//Upper Left TTL
-#define TTL_UL PORTD6
-//Upper Right TTL
-#define TTL_UR PORTD5
-//Bottom Left TTL 
-#define TTL_BL PORTD7
-//Bottom Right TTL
-#define TTL_BR PORTD4
+//3 bit wheel system
+#define BIT_DDR  DDRB
+#define BIT_PORT PORTB
+//Upper Left LED
+#define BIT_0  PORTB5
+#define BIT_1  PORTB4
+#define BIT_2  PORTB3
 
 #endif
-
-//TTL camera  (out)
-#define TTL_camera  TTL_UL
-
-//LED camera  (out)
-#define LED_camera  LED_UL
-//LED wait next reset  (out)
-#define LED_wait  LED_BR
 
 //"Error 1 __builtin_avr_delay_cycles expects an integer constant. "
 
@@ -80,11 +67,11 @@ void testAllLED(int repeat,int delay,int *led/*[6]*/)
   for(r=0;r<repeat;++r)
   {
     //LED on
-    for(i=0;i<6;++i) LED_PORT|=_BV(led[i]);
+    for(i=0;i<4;++i) LED_PORT|=_BV(led[i]);
     //wait a while
     delay_ms(delay);
     //LED off
-    for(i=0;i<6;++i) LED_PORT&=~_BV(led[i]);
+    for(i=0;i<4;++i) LED_PORT&=~_BV(led[i]);
     //wait a while
     delay_ms(delay);
   }//for loop test
@@ -97,7 +84,7 @@ void testAllLED(int repeat,int delay,int *led/*[6]*/)
  * 
  * 
 **/
-void testLEDmap(int repeat,int delay,int *led/*[6]*/,int *ttl/*[4]*/)
+void testLEDmap(int repeat,int delay,int *led/*[4]*/)
 {
   int i,r;
   //repeat loop
@@ -107,121 +94,43 @@ void testLEDmap(int repeat,int delay,int *led/*[6]*/,int *ttl/*[4]*/)
     for(i=0;i<4;++i)
     {
       //ON
-      TTL_PORT|=_BV(ttl[i]);//TTL up
       LED_PORT|=_BV(led[i]);//LED on
       delay_ms(delay);
       //OFF
-      TTL_PORT&=~_BV(ttl[i]);//TTL down
       LED_PORT&=~_BV(led[i]);//LED off
       delay_ms(delay);
     }//digital loop
     delay_ms(delay);
-/** /
-    //analog LED
-    for(i=4;i<6;++i)
-    {
-      //ON
-      LED_PORT|=_BV(led[i]);//LED on
-      delay_ms(delay);
-      //OFF
-      LED_PORT&=~_BV(led[i]);//LED off
-      delay_ms(delay);
-    }//analog loop
-    delay_ms(delay);
-/**/
   }//repeat loop
 }//testLEDmap
-
-//wait_TTL(TTL_PIV,LED_PIV);
-inline void wait_TTL(char ttl,char led)
-{
-///wait for start trigger on TTL
-  //LED ON (i.e. !TTL)
-  LED_PORT|=_BV(led);
-  //wait
-  loop_until_bit_is_set(TTL_PIN,ttl); //wait for TTL synchronization up
-  //LED OFF (i.e. !TTL)
-  LED_PORT&=~_BV(led);
-}
-
-/*
-//wait_TTL_(TTL_PIV,LED_PIV);
-#define wait_TTL_(ttl,led) \
-{ \
-  LED_PORT|=_BV(led); \
-  loop_until_bit_is_set(TTL_PIN,ttl); \
-  LED_PORT&=~_BV(led); \
-}
-*/
-
-//wait_TTL_(PIV);
-#define wait_TTL_(pin) \
-{ \
-  LED_PORT|=_BV(LED_##pin); \
-  loop_until_bit_is_set(TTL_PIN,TTL_##pin); \
-  LED_PORT&=~_BV(LED_##pin); \
-}
-
-//!
-/**
- * record a single image (with both TTL and LED)
-**/
-inline void record_image(const int delayUp,const int delay1)
-{
-    //ON
-    ///TTL
-    TTL_PORT|=_BV(TTL_camera);//TTL on camera
-    ///LED
-    LED_PORT|=_BV(LED_camera);//LED on camera
-    //delay (i.e. TTL up time)
-    delay_ms(delayUp);//delay0
-    //OFF
-    TTL_PORT&=~_BV(TTL_camera);//TTL off camera
-    //delay (i.e. LED exposure time)
-    delay_ms(delay1);
-    LED_PORT&=~_BV(LED_camera);//LED off camera
-}//record_image
 
 //
 int main(void)
 {
 //initialisation
 ///TTL
-//  TTL_DDR&=~_BV(TTL_UL);//TTL input
-  TTL_DDR|=_BV(TTL_camera);//TTL output: sync for camera (FlowMaster, ImagerIntense, Phantom, ...)
+//  BIT_DDR&=~_BV(TTL_UL);//as input
 ///LED
-  LED_DDR|=_BV(LED_camera)|_BV(LED_wait);//|_BV(LED_UL)|_BV(LED_UR);//LED output: TTL_UL and wait for reset
+  LED_DDR|=_BV(LED_BL)|_BV(LED_BR)|_BV(LED_UL)|_BV(LED_UR);//LED output
 
 /**/
 //mapping
-  int ttl[4]={TTL_UL,TTL_UR,TTL_BL,TTL_BR};
-  int led[6]={LED_UL,LED_UR,LED_BL,LED_BR};//,LED_AL,LED_AR};
+  int led[4]={LED_UL,LED_UR,LED_BL,LED_BR};
 //test
   LED_DDR=255;//all LED output
   testAllLED(2,500,led);
-  testLEDmap(2,500,led,ttl);
+  testLEDmap(2,500,led);
   testAllLED(1,1000,led);
 /**/
 
-//initialisation
+//3 bit wheel system test program
   LED_PORT=0;//all LED off
 
-//internal delay generator
-///TTL
-const int period=1000;//period=delay0+delay1+delay2
-const int delayUp=10;//delay0
-const int delayDown=period-delayUp;
-///LED
-const int exposure=250;
-const int delay1=exposure-delayUp;//exposure=delay0+delay1
-const int delay2=delayDown-delay1;//delayDown=delay1+delay2
-
-//sequence
-  int i;
-  for(i=0;i<10;++i) {record_image(delayUp,delay1);delay_ms(delay2);}
-  LED_PORT|=_BV(LED_wait);//LED on wait
 //loop
-  while(1){}//infinite loop
+  while(1)
+  {
+    testLEDmap(1,250,led);
+  }//infinite loop
   return (0);
 }
 
