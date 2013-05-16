@@ -110,6 +110,19 @@ inline void set_LED_for_bit(int bit,int led)
   if(bit_is_set(BIT_PIN,bit)) LED_PORT|=_BV(led); else LED_PORT&=~_BV(led);
 }
 
+inline void set_LEDs(unsigned char value)
+{
+  if(value&0b00000001) {LED_PORT|=_BV(LED_UL);} else {LED_PORT&=~_BV(LED_UL);}
+  if(value&0b00000010) {LED_PORT|=_BV(LED_UR);} else {LED_PORT&=~_BV(LED_UR);}
+  if(value&0b00000100) {LED_PORT|=_BV(LED_BL);} else {LED_PORT&=~_BV(LED_BL);}
+}
+
+inline void test_LED_map(void)
+{
+  unsigned char i=0;
+  for(i=0;i<7;++i) {set_LEDs(i);delay_ms(1234);}
+}
+
 //
 int main(void)
 {
@@ -133,10 +146,24 @@ int main(void)
 
 //3 bit wheel system test program
   LED_PORT=0;//all LED off
+
+
   int delay=321;
 //loop
   while(1)
   {
+  unsigned char wheel=_SFR_BYTE(BIT_PIN);
+/*
+  unsigned char value=3;//0;
+  if( (wheel&_BV(BIT_0))==_BV(BIT_0) ) value|=0b00000001;
+  if( (wheel&_BV(BIT_1))==_BV(BIT_1) ) value|=0b00000010;
+  if( (wheel&_BV(BIT_2))==_BV(BIT_2) ) value|=0b00000100;
+  set_LEDs(value);
+*/
+  testAllLED(1,250,led);
+  test_LED_map();
+  testAllLED(1,250,led);
+/*
     set_LED_for_bit(BIT_0,LED_UL);
     set_LED_for_bit(BIT_1,LED_UR);
     set_LED_for_bit(BIT_2,LED_BL);
@@ -151,14 +178,6 @@ code
  5 101 010
  6 011 100
 */
-    delay_ms(1234);
-    //enlight BR LED
-    LED_PORT|=_BV(LED_BR);
-    delay=_SFR_BYTE(BIT_PIN)&0xb11100000;//&0xb00000111;
-    delay_ms(delay*100);
-    LED_PORT&=~_BV(LED_BR);
-    //all LED on
-    testAllLED(1,500,led);
   }//infinite loop
   return (0);
 }
