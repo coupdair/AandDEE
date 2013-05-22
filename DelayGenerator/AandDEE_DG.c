@@ -123,6 +123,15 @@ inline void test_LED_map(void)
   for(i=0;i<7;++i) {set_LEDs(i);delay_ms(1234);}
 }
 
+inline uint8_t get_value(uint8_t wheel)
+{
+  uint8_t value=0;
+  if( !(wheel&_BV(BIT_0)) ) value|=0b00000001;
+  if( !(wheel&_BV(BIT_1)) ) value|=0b00000010;
+  if( !(wheel&_BV(BIT_2)) ) value|=0b00000100;
+  return value;
+}
+
 //
 int main(void)
 {
@@ -151,19 +160,18 @@ int main(void)
   test_LED_map();
   testAllLED(1,250,led);
 
-  unsigned char wheel;
-  unsigned char value;
-  int delay=321;
+  uint8_t wheel;
+  uint8_t value;
+  int delay;
 //loop
   while(1)
   {
   wheel=_SFR_BYTE(BIT_PIN);
-  value=0;
-  if( !(wheel&_BV(BIT_0)) ) value|=0b00000001;
-  if( !(wheel&_BV(BIT_1)) ) value|=0b00000010;
-  if( !(wheel&_BV(BIT_2)) ) value|=0b00000100;
+  value=get_value(wheel);
   set_LEDs(value);
-  delay_ms(345);
+  delay=345*(int)(value+1);
+  delay_ms(delay);
+  testAllLED(1,250,led);
 /*
     set_LED_for_bit(BIT_0,LED_UL);
     set_LED_for_bit(BIT_1,LED_UR);
