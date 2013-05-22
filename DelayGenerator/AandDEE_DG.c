@@ -44,13 +44,15 @@
 
 #endif
 
+//TTL trigger (in)
+#define TTL_trigger TTL_UL
 //TTL camera  (out)
-#define TTL_camera  TTL_UL
+#define TTL_camera  TTL_UR
 
+//LED trigger (out)
+#define LED_trigger LED_UL
 //LED camera  (out)
-#define LED_camera  LED_UL
-//LED wait next reset  (out)
-#define LED_wait  LED_BR
+#define LED_camera  LED_UR
 
 //"Error 1 __builtin_avr_delay_cycles expects an integer constant. "
 
@@ -185,10 +187,10 @@ int main(void)
 {
 //initialisation
 ///TTL
-//  TTL_DDR&=~_BV(TTL_UL);//TTL input
+  TTL_DDR&=~_BV(TTL_trigger);//TTL input
   TTL_DDR|=_BV(TTL_camera);//TTL output: sync for camera (FlowMaster, ImagerIntense, Phantom, ...)
 ///LED
-  LED_DDR|=_BV(LED_camera)|_BV(LED_wait);//|_BV(LED_UL)|_BV(LED_UR);//LED output: TTL_UL and wait for reset
+  LED_DDR|=_BV(LED_camera)|_BV(LED_trigger);//|_BV(LED_UL)|_BV(LED_UR);//LED output: TTL_UL and wait for reset
 
 /** /
 //mapping
@@ -216,8 +218,13 @@ const int delay2=delayDown-delay1;//delayDown=delay1+delay2
 
 //sequence
   int i;
-  for(i=0;i<10;++i) {record_image(delayUp,delay1);delay_ms(delay2);}
-  LED_PORT|=_BV(LED_wait);//LED on wait
+  for(i=0;i<10;++i)
+  {
+    wait_TTL_(trigger);
+    delay_ms(123);
+  }
+  TTL_PORT|=_BV(TTL_camera);//LED on wait    
+  LED_PORT|=_BV(LED_camera);//LED on wait
 //loop
   while(1){}//infinite loop
   return (0);
