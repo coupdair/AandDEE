@@ -37,8 +37,6 @@
 #define BIT_0  PORTB5
 #define BIT_1  PORTB4
 #define BIT_2  PORTB3
-//wheel power pin
-#define BIT_ON PORTB2
 
 #endif
 
@@ -142,7 +140,6 @@ int main(void)
   BIT_DDR&=~_BV(BIT_0);//as input (connected to ground or free: seems strange/random behaviour)
   BIT_DDR&=~_BV(BIT_1);//as input
   BIT_DDR&=~_BV(BIT_2);//as input
-  BIT_DDR|=_BV(BIT_ON);//as output power on wheel (0 otherwhise)
 ///LED
   LED_DDR|=_BV(LED_BL)|_BV(LED_BR)|_BV(LED_UL)|_BV(LED_UR);//LED output
 
@@ -161,22 +158,20 @@ int main(void)
 
   testAllLED(1,250,led);
   test_LED_map();
-  testAllLED(1,250,led);
+//  testAllLED(1,250,led);
 
   uint8_t wheel;
   uint8_t value;
-  int delay;
-  //power ON the wheel
-  BIT_PORT|=_BV(BIT_ON);
+  int delay=123;
 //loop
   while(1)
   {
   wheel=_SFR_BYTE(BIT_PIN);
   value=get_value(wheel);
   set_LEDs(value);
-  delay=345*(int)(value+1)+123;
+//  delay=345*(int)(value+1)+123;
   delay_ms(delay);
-  testAllLED(1,250,led);
+//  testAllLED(1,250,led);
 /*
     set_LED_for_bit(BIT_0,LED_UL);
     set_LED_for_bit(BIT_1,LED_UR);
