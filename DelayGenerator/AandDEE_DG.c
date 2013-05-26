@@ -218,13 +218,13 @@ const int delay2=delayDown-delay1;//delayDown=delay1+delay2
 
 //sequence
   int i;
-  for(i=0;i<10;++i)
+  for(i=0;i<15;++i)
   {
     wait_TTL_(trigger);
-    delay_ms(123);
+    delay_ms(345);
   }
-  TTL_PORT|=_BV(TTL_camera);//LED on wait    
-  LED_PORT|=_BV(LED_camera);//LED on wait
+  TTL_PORT|=_BV(TTL_camera);//set trigger to camera
+  LED_PORT|=_BV(LED_camera);//LED on triggering
 //loop
   while(1){}//infinite loop
   return (0);
