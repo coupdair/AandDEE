@@ -155,6 +155,24 @@ inline void value_as_count(const uint8_t value)
   delay_ms(delay);
 }
 
+inline void value_as_input(const uint8_t value)
+{
+  int delay=123;
+  switch(value)
+  {
+    case  0: break;
+    case  1: LED_PORT|=_BV(LED_UL);break;
+    case  2: LED_PORT|=_BV(LED_UR);break;
+    case  3: LED_PORT|=_BV(LED_UL);LED_PORT|=_BV(LED_UR);break;
+    default: LED_PORT|=_BV(LED_BR);break;
+  }//value
+  delay_ms(delay);
+  LED_PORT&=~_BV(LED_UL);
+  LED_PORT&=~_BV(LED_UR);
+  LED_PORT&=~_BV(LED_BL);
+  LED_PORT&=~_BV(LED_BR);
+}
+
 //
 int main(void)
 {
@@ -188,9 +206,12 @@ int main(void)
   {
   wheel=_SFR_BYTE(BIT_PIN);
   value=get_value(wheel);
-  set_LEDs(value);
-  //value_as_delay(value);testAllLED(1,234,led);
-  value_as_count(value);
+  //value as delay
+//  set_LEDs(value);value_as_delay(value);testAllLED(1,234,led);
+  //value as count
+//  set_LEDs(value);value_as_count(value);
+  //value as config
+  value_as_input(value);
 /*
 code
  i bin
