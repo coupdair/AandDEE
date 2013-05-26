@@ -162,30 +162,36 @@ int main(void)
 
   uint8_t wheel;
   uint8_t value;
-  int delay=123;
+  int delay=234;
 //loop
   while(1)
   {
   wheel=_SFR_BYTE(BIT_PIN);
   value=get_value(wheel);
   set_LEDs(value);
+  //value as delay
 //  delay=345*(int)(value+1)+123;
   delay_ms(delay);
-//  testAllLED(1,250,led);
-/*
-    set_LED_for_bit(BIT_0,LED_UL);
-    set_LED_for_bit(BIT_1,LED_UR);
-    set_LED_for_bit(BIT_2,LED_BL);
+  //value as count
+  int i;
+  for(i=0;i<value+1;++i)
+  {
+    LED_PORT|=_BV(LED_BR);
+    delay_ms(delay);
+    LED_PORT&=~_BV(LED_BR);
+    delay_ms(delay);
+  }
+  delay_ms(delay);
 /*
 code
- i bin led
- 0 000 111
- 1 100 011
- 2 010 101
- 3 110 001
- 4 001 110
- 5 101 010
- 6 011 100
+ i bin
+ 0 000
+ 1 100
+ 2 010
+ 3 110
+ 4 001
+ 5 101
+ 6 011
 */
   }//infinite loop
   return (0);
