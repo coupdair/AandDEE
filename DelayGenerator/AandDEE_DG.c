@@ -33,10 +33,12 @@
 #define BIT_DDR  DDRB
 #define BIT_PORT PORTB
 #define BIT_PIN  PINB
-//Upper Left LED
+//Left to right LED
 #define BIT_0  PORTB5
 #define BIT_1  PORTB4
 #define BIT_2  PORTB3
+//wheel power pin
+#define BIT_ON PORTB2
 
 #endif
 
@@ -126,9 +128,9 @@ inline void test_LED_map(void)
 inline uint8_t get_value(uint8_t wheel)
 {
   uint8_t value=0;
-  if( !(wheel&_BV(BIT_0)) ) value|=0b00000001;
-  if( !(wheel&_BV(BIT_1)) ) value|=0b00000010;
-  if( !(wheel&_BV(BIT_2)) ) value|=0b00000100;
+  if( wheel&_BV(BIT_0) ) value|=0b00000001;
+  if( wheel&_BV(BIT_1) ) value|=0b00000010;
+  if( wheel&_BV(BIT_2) ) value|=0b00000100;
   return value;
 }
 
@@ -140,6 +142,7 @@ int main(void)
   BIT_DDR&=~_BV(BIT_0);//as input (connected to ground or free: seems strange/random behaviour)
   BIT_DDR&=~_BV(BIT_1);//as input
   BIT_DDR&=~_BV(BIT_2);//as input
+  BIT_DDR|=_BV(BIT_ON);//as output power on wheel (0 otherwhise)
 ///LED
   LED_DDR|=_BV(LED_BL)|_BV(LED_BR)|_BV(LED_UL)|_BV(LED_UR);//LED output
 
@@ -163,6 +166,8 @@ int main(void)
   uint8_t wheel;
   uint8_t value;
   int delay;
+  //power ON the wheel
+  BIT_PORT|=_BV(BIT_ON);
 //loop
   while(1)
   {
