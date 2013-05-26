@@ -132,6 +132,29 @@ inline uint8_t get_value(uint8_t wheel)
   return value;
 }
 
+inline void value_as_delay(const uint8_t value)
+{
+  int delay=345*(int)(value+1)+123;
+  LED_PORT|=_BV(LED_BR);
+  delay_ms(delay);
+  LED_PORT&=~_BV(LED_BR);
+}
+
+inline void value_as_count(const uint8_t value)
+{
+  int delay=234;
+  delay_ms(delay);
+  int i;
+  for(i=0;i<value+1;++i)
+  {
+    LED_PORT|=_BV(LED_BR);
+    delay_ms(delay);
+    LED_PORT&=~_BV(LED_BR);
+    delay_ms(delay);
+  }
+  delay_ms(delay);
+}
+
 //
 int main(void)
 {
@@ -156,32 +179,18 @@ int main(void)
 //3 bit wheel system test program
   LED_PORT=0;//all LED off
 
-  testAllLED(1,250,led);
   test_LED_map();
-//  testAllLED(1,250,led);
 
   uint8_t wheel;
   uint8_t value;
-  int delay=234;
 //loop
   while(1)
   {
   wheel=_SFR_BYTE(BIT_PIN);
   value=get_value(wheel);
   set_LEDs(value);
-  //value as delay
-//  delay=345*(int)(value+1)+123;
-  delay_ms(delay);
-  //value as count
-  int i;
-  for(i=0;i<value+1;++i)
-  {
-    LED_PORT|=_BV(LED_BR);
-    delay_ms(delay);
-    LED_PORT&=~_BV(LED_BR);
-    delay_ms(delay);
-  }
-  delay_ms(delay);
+  //value_as_delay(value);testAllLED(1,234,led);
+  value_as_count(value);
 /*
 code
  i bin
