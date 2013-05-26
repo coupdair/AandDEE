@@ -128,9 +128,9 @@ inline void test_LED_map(void)
 inline uint8_t get_value(uint8_t wheel)
 {
   uint8_t value=0;
-  if( wheel&_BV(BIT_0) ) value|=0b00000001;
+  if( wheel&_BV(BIT_2) ) value|=0b00000001;
   if( wheel&_BV(BIT_1) ) value|=0b00000010;
-  if( wheel&_BV(BIT_2) ) value|=0b00000100;
+  if( wheel&_BV(BIT_0) ) value|=0b00000100;
   return value;
 }
 
@@ -174,7 +174,7 @@ int main(void)
   wheel=_SFR_BYTE(BIT_PIN);
   value=get_value(wheel);
   set_LEDs(value);
-  delay=345*(int)(value+1);
+  delay=345*(int)(value+1)+123;
   delay_ms(delay);
   testAllLED(1,250,led);
 /*
