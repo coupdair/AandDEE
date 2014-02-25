@@ -133,7 +133,8 @@ void initialize(void)
   ADCSRA   = 0b10000100;// Enable ADC with Clock prescaled by 16 ; If Clock speed is 8MHz, then ADC clock = 8MHz/16 = 500kHz
   DIDR0    = 0b00111111;// Disable Digital Input on all ADC Channel to reduce power consumption
   //bc obase=2 5 101
-  ADMUX    = 0b11000000;// 0b11000101 Disable Left-Adjust and select Internal 1.1V reference and ADC Channel 5 '0101' as input (0 '0000') p265
+  ADMUX    = 0b11000101;// 0b11000101 Disable Left-Adjust and select Internal 1.1V reference and
+                //ADC Channel 5 '0101' as input (0 '0000') p265
   compare  = (unsigned int)THRESHOLD;// (465 -> 0.5V Equivalent Counts for 1.1 V ADC Reference)
 }//initialize
 
@@ -145,8 +146,8 @@ void convert(void)
   while((ADCSRA & (1<<ADIF)) != 0x10);	// Wait till conversion is complete
   result   = ADC;                       // Read the ADC Result
   ADCSRA  |= (1 << ADIF);		// Clear ADC Conversion Interrupt Flag
-//  if(result <= compare)                 // Compare the converted result with 0.5 V
-  if(result > compare)                 // Compare the converted result with 0.5 V
+  if(result <= compare)                 // Compare the converted result with 0.5 V
+//  if(result > compare)                 // Compare the converted result with 0.5 V
     LED_PORT|=_BV(LED_BR);//LED on
   else
     LED_PORT&=~_BV(LED_BR);//LED off
@@ -172,10 +173,6 @@ int main(void)
 ///LED
   LED_DDR|=_BV(LED_BL)|_BV(LED_BR)|_BV(LED_UL)|_BV(LED_UR);//LED output
 
-//mapping
-  int ttl[4]={TTL_UL,TTL_UR,TTL_BR/*L*/,TTL_BR};
-  int led[6]={LED_UL,LED_UR,LED_BL,LED_BR,LED_AL,LED_AR};
-
 //ADC
 #define ADC_ENABLE
 
@@ -183,15 +180,28 @@ int main(void)
 initialize();
 #endif
 
+//mapping
+  int ttl[4]={TTL_UL,
+              TTL_UR,
+#ifdef ADC_ENABLE
+              TTL_BR,
+#else
+              TTL_BL,
+#endif
+              TTL_BR};
+  int led[6]={LED_UL,LED_UR,LED_BL,LED_BR,LED_AL,LED_AR};
+
 //test
 /**/
   testAllLED(2,500,led);
-//  testLEDmap(2,500,led,ttl);
+#ifndef ADC_ENABLE
+  testLEDmap(2,500,led,ttl);
+#endif
 //  testAllLED(1,1000,led);
 /**/
 
 #ifdef ADC_ENABLE
-_delay_ms(12000);//test: wait a while for ADC ready ?
+_delay_ms(20000);//test: wait a while for ADC ready ?
 #endif
 
 //loop
