@@ -190,8 +190,8 @@ int main(void)
 //test
   LED_DDR=255;//all LED output
   testAllLED(2,500,led);
-//  testLEDmap(2,500,led);
-//  testAllLED(1,1000,led);
+  testLEDmap(2,500,led);
+  testAllLED(1,1000,led);
 /**/
 
 //3 bit wheel system test program
@@ -204,25 +204,7 @@ int main(void)
 //loop
   while(1)
   {
-  wheel=_SFR_BYTE(BIT_PIN);
-  value=get_value(wheel);
-  //value as delay
-//  set_LEDs(value);value_as_delay(value);testAllLED(1,234,led);
-  //value as count
-//  set_LEDs(value);value_as_count(value);
-  //value as config
-  value_as_input(value);
-/*
-code
- i bin
- 0 000
- 1 100
- 2 010
- 3 110
- 4 001
- 5 101
- 6 011
-*/
+    test_LED_map();  
   }//infinite loop
   return (0);
 }
