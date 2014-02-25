@@ -161,7 +161,8 @@ int main(void)
   TTL_DDR|=_BV(TTL_UL);//TTL output
   TTL_DDR|=_BV(TTL_UR);//TTL output
   TTL_DDR|=_BV(TTL_BR);//TTL output
-  TTL_DDR|=_BV(TTL_BL);//TTL output
+//  TTL_DDR|=_BV(TTL_BL);//TTL output
+  TTL_DDR&=~_BV(TTL_BL);//TTL input
 /*or for ArduinoUNO* /
 //  TTL_DDR=0b01111111;//BL for AandDEE.shield.v0.0.1 or BR for AandDEE.shield.v0.1.1
   TTL_DDR=0b11111111;//all output
@@ -172,7 +173,7 @@ int main(void)
   LED_DDR|=_BV(LED_BL)|_BV(LED_BR)|_BV(LED_UL)|_BV(LED_UR);//LED output
 
 //mapping
-  int ttl[4]={TTL_UL,TTL_UR,TTL_BL,TTL_BR};
+  int ttl[4]={TTL_UL,TTL_UR,TTL_BR/*L*/,TTL_BR};
   int led[6]={LED_UL,LED_UR,LED_BL,LED_BR,LED_AL,LED_AR};
 
 //ADC
@@ -194,8 +195,16 @@ LED_PORT|=_BV(LED_BL);//LED on
   {
 LED_PORT|=_BV(LED_UL);//LED on
 LED_PORT&=~_BV(LED_UR);//LED off
-    //ADC
+    //ADC test
+/** /
     convert();
+/**/
+    //D test
+    if( bit_is_set(TTL_PIN,TTL_BL) )
+      LED_PORT|=_BV(LED_BR);//LED on
+    else
+      LED_PORT&=~_BV(LED_BR);//LED off
+/**/
 LED_PORT&=~_BV(LED_UL);//LED off
 LED_PORT|=_BV(LED_UR);//LED on
     //wait for next ADConvertion, so lighting LED could be seen.
