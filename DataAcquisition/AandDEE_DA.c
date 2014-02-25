@@ -39,13 +39,13 @@
 #define TTL_PORT PORTD
 #define TTL_PIN  PIND
 //Upper Left TTL
-#define TTL_UL PORTD4
+#define TTL_UL PORTD6
 //Upper Right TTL
-#define TTL_UR PORTD6
+#define TTL_UR PORTD5
 //Bottom Left TTL 
 #define TTL_BL PORTD7
 //Bottom Right TTL
-#define TTL_BR PORTD5
+#define TTL_BR PORTD4
 
 //2 analog on single port
 //Analog INput C0-5
