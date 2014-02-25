@@ -1,0 +1,5 @@
+#compile and load
+make clean; make && make upload && make size
+
+#Makefile
+
