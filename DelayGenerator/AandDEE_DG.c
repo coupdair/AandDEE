@@ -46,11 +46,15 @@
 
 //TTL camera  (out)
 #define TTL_camera  TTL_UL
+//TTL matrixi  (out)
+#define TTL_matrixi TTL_UR
 
 //LED camera  (out)
 #define LED_camera  LED_UL
+//LED matrixi  (out)
+#define LED_matrixi LED_UR
 //LED wait next reset  (out)
-#define LED_wait  LED_BR
+#define LED_wait    LED_BR
 
 //"Error 1 __builtin_avr_delay_cycles expects an integer constant. "
 
@@ -171,13 +175,23 @@ inline void record_image(const int delayUp,const int delay1)
     TTL_PORT|=_BV(TTL_camera);//TTL on camera
     ///LED
     LED_PORT|=_BV(LED_camera);//LED on camera
+    ///LED and TTL matrixi
+    LED_PORT|=_BV(LED_matrixi);//LED on matrixi
+    TTL_PORT|=_BV(TTL_matrixi);//TTL on matrixi
     //delay (i.e. TTL up time)
     delay_ms(delayUp);//delay0
     //OFF
     TTL_PORT&=~_BV(TTL_camera);//TTL off camera
+<<<<<<< HEAD
     //delay (i.e. LED exposure time)
     delay_ms(delay1);
+=======
+    TTL_PORT&=~_BV(TTL_matrixi);//TTL off matrixi
+    ///delay (i.e. LED exposure time)
+    _delay_ms(delay1);
+>>>>>>> b4a640b2ec06d75aca964fcfeb1d77e5ed53eb8d
     LED_PORT&=~_BV(LED_camera);//LED off camera
+    LED_PORT&=~_BV(LED_matrixi);//LED off matrixi
 }//record_image
 
 //
@@ -186,9 +200,9 @@ int main(void)
 //initialisation
 ///TTL
 //  TTL_DDR&=~_BV(TTL_UL);//TTL input
-  TTL_DDR|=_BV(TTL_camera);//TTL output: sync for camera (FlowMaster, ImagerIntense, Phantom, ...)
+  TTL_DDR|=_BV(TTL_camera)|_BV(TTL_matrixi);//TTL output: sync for camera (FlowMaster, ImagerIntense, Phantom, ...)
 ///LED
-  LED_DDR|=_BV(LED_camera)|_BV(LED_wait);//|_BV(LED_UL)|_BV(LED_UR);//LED output: TTL_UL and wait for reset
+  LED_DDR|=_BV(LED_camera)|_BV(LED_matrixi)|_BV(LED_wait);//|_BV(LED_UL);//LED output: TTL_UL and wait for reset
 
 /** /
 //mapping
@@ -206,6 +220,7 @@ int main(void)
 
 //internal delay generator
 ///TTL
+<<<<<<< HEAD
 const int period=1000;//period=delay0+delay1+delay2
 const int delayUp=10;//delay0
 const int delayDown=period-delayUp;
@@ -217,6 +232,19 @@ const int delay2=delayDown-delay1;//delayDown=delay1+delay2
 //sequence
   int i;
   for(i=0;i<10;++i) {record_image(delayUp,delay1);delay_ms(delay2);}
+=======
+int period=250;//period=delay0+delay1+delay2
+int delayUp=10;//delay0
+int delayDown=period-delayUp;
+///LED
+int exposure=100;
+int delay1=exposure-delayUp;//exposure=delay0+delay1
+int delay2=delayDown-delay1;//delayDown=delay1+delay2
+
+//sequence
+  int i;
+  for(i=0;i<100;++i) {record_image(delayUp,delay1);_delay_ms(delay2);}
+>>>>>>> b4a640b2ec06d75aca964fcfeb1d77e5ed53eb8d
   LED_PORT|=_BV(LED_wait);//LED on wait
 //loop
   while(1){}//infinite loop

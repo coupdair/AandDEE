@@ -9,3 +9,7 @@ make clean; make && make upload && make size
   internal mode: (empty)
   external mode: -DEXTERNAL_TRIGGER
 
+#PCO
+#1. start recording (n+1)
+#2. echo "reset matrixi" > /dev/ttyACM0; sleep 2; echo "reset AandDEE" > /dev/ttyACM1
+
