@@ -177,7 +177,11 @@ int main(void)
   int led[6]={LED_UL,LED_UR,LED_BL,LED_BR,LED_AL,LED_AR};
 
 //ADC
+//#define ADC_ENABLE
+
+#ifdef ADC_ENABLE
 initialize();
+#endif
 
 //test
 /**/
@@ -186,7 +190,9 @@ initialize();
 //  testAllLED(1,1000,led);
 /**/
 
-_delay_ms(12000);
+#ifdef ADC_ENABLE
+_delay_ms(12000);//test: wait a while for ADC ready ?
+#endif
 
 //loop
   int delay=234;
@@ -196,15 +202,15 @@ LED_PORT|=_BV(LED_BL);//LED on
 LED_PORT|=_BV(LED_UL);//LED on
 LED_PORT&=~_BV(LED_UR);//LED off
     //ADC test
-/** /
+#ifdef ADC_ENABLE
     convert();
-/**/
-    //D test
+#else
+    // D  test
     if( bit_is_set(TTL_PIN,TTL_BL) )
       LED_PORT|=_BV(LED_BR);//LED on
     else
       LED_PORT&=~_BV(LED_BR);//LED off
-/**/
+#endif
 LED_PORT&=~_BV(LED_UL);//LED off
 LED_PORT|=_BV(LED_UR);//LED on
     //wait for next ADConvertion, so lighting LED could be seen.
