@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#define __DELAY_BACKWARD_COMPATIBLE__
 #include <util/delay.h>
 #include <avr/io.h>
 
@@ -182,14 +183,9 @@ inline void record_image(const int delayUp,const int delay1)
     delay_ms(delayUp);//delay0
     //OFF
     TTL_PORT&=~_BV(TTL_camera);//TTL off camera
-<<<<<<< HEAD
-    //delay (i.e. LED exposure time)
-    delay_ms(delay1);
-=======
     TTL_PORT&=~_BV(TTL_matrixi);//TTL off matrixi
     ///delay (i.e. LED exposure time)
     _delay_ms(delay1);
->>>>>>> b4a640b2ec06d75aca964fcfeb1d77e5ed53eb8d
     LED_PORT&=~_BV(LED_camera);//LED off camera
     LED_PORT&=~_BV(LED_matrixi);//LED off matrixi
 }//record_image
@@ -220,19 +216,6 @@ int main(void)
 
 //internal delay generator
 ///TTL
-<<<<<<< HEAD
-const int period=1000;//period=delay0+delay1+delay2
-const int delayUp=10;//delay0
-const int delayDown=period-delayUp;
-///LED
-const int exposure=250;
-const int delay1=exposure-delayUp;//exposure=delay0+delay1
-const int delay2=delayDown-delay1;//delayDown=delay1+delay2
-
-//sequence
-  int i;
-  for(i=0;i<10;++i) {record_image(delayUp,delay1);delay_ms(delay2);}
-=======
 int period=250;//period=delay0+delay1+delay2
 int delayUp=10;//delay0
 int delayDown=period-delayUp;
@@ -244,7 +227,6 @@ int delay2=delayDown-delay1;//delayDown=delay1+delay2
 //sequence
   int i;
   for(i=0;i<100;++i) {record_image(delayUp,delay1);_delay_ms(delay2);}
->>>>>>> b4a640b2ec06d75aca964fcfeb1d77e5ed53eb8d
   LED_PORT|=_BV(LED_wait);//LED on wait
 //loop
   while(1){}//infinite loop
