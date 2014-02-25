@@ -52,7 +52,7 @@
 //AIN: A0-5 <=> C0-5
 #define AIN 5
 //threshold 5V = 10 bit = 1024
-#define THRESHOLD 128
+#define THRESHOLD 465
 
 #endif
 
@@ -133,8 +133,8 @@ void initialize(void)
   ADCSRA   = 0b10000100;// Enable ADC with Clock prescaled by 16 ; If Clock speed is 8MHz, then ADC clock = 8MHz/16 = 500kHz
   DIDR0    = 0b00111111;// Disable Digital Input on all ADC Channel to reduce power consumption
   //bc obase=2 5 101
-  ADMUX    = 0b11000101;// Disable Left-Adjust and select Internal 1.1V reference and ADC Channel 5 '0101' as input (0 '0000') p265
-  compare  = (unsigned int)THRESHOLD;// (465 -> 0.5V Equvlaent Counts for 1.1 V ADC Reference)
+  ADMUX    = 0b11000000;// 0b11000101 Disable Left-Adjust and select Internal 1.1V reference and ADC Channel 5 '0101' as input (0 '0000') p265
+  compare  = (unsigned int)THRESHOLD;// (465 -> 0.5V Equivalent Counts for 1.1 V ADC Reference)
 }//initialize
 
 /*! \brief ADC Conversion Routine
@@ -145,10 +145,11 @@ void convert(void)
   while((ADCSRA & (1<<ADIF)) != 0x10);	// Wait till conversion is complete
   result   = ADC;                       // Read the ADC Result
   ADCSRA  |= (1 << ADIF);		// Clear ADC Conversion Interrupt Flag
-  if(result <= compare)                 // Compare the converted result with 0.5 V
-    LED_PORT|=_BV(LED_UL);//LED on
+//  if(result <= compare)                 // Compare the converted result with 0.5 V
+  if(result > compare)                 // Compare the converted result with 0.5 V
+    LED_PORT|=_BV(LED_BR);//LED on
   else
-    LED_PORT&=~_BV(LED_UL);//LED off
+    LED_PORT&=~_BV(LED_BR);//LED off
 }//convert
 
 //
@@ -180,16 +181,23 @@ initialize();
 //test
 /**/
   testAllLED(2,500,led);
-  testLEDmap(2,500,led,ttl);
-  testAllLED(1,1000,led);
+//  testLEDmap(2,500,led,ttl);
+//  testAllLED(1,1000,led);
 /**/
 
+_delay_ms(12000);
+
 //loop
-  int delay=456;
+  int delay=234;
+LED_PORT|=_BV(LED_BL);//LED on
   while(1)
   {
+LED_PORT|=_BV(LED_UL);//LED on
+LED_PORT&=~_BV(LED_UR);//LED off
     //ADC
     convert();
+LED_PORT&=~_BV(LED_UL);//LED off
+LED_PORT|=_BV(LED_UR);//LED on
     //wait for next ADConvertion, so lighting LED could be seen.
     _delay_ms(delay);
   }//infinite loop
