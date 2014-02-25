@@ -177,7 +177,7 @@ int main(void)
   int led[6]={LED_UL,LED_UR,LED_BL,LED_BR,LED_AL,LED_AR};
 
 //ADC
-//#define ADC_ENABLE
+#define ADC_ENABLE
 
 #ifdef ADC_ENABLE
 initialize();
