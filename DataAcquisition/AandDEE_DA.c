@@ -126,28 +126,35 @@ unsigned int compare;
 
 /*! \brief Initializes ADC Peripheral
      Configuration Registers */
-void initialize(void)
+void ADC_init(void)
 {
-//  DDRB    |= 0b00010001;        			// Set PORTB.0  as output
-//  PORTB   |= 0b00010001;        			// Initialize PORTB.0 with logic "one"
-  ADCSRA   = 0b10000100;// Enable ADC with Clock prescaled by 16 ; If Clock speed is 8MHz, then ADC clock = 8MHz/16 = 500kHz
-  DIDR0    = 0b00111111;// Disable Digital Input on all ADC Channel to reduce power consumption
-  //bc obase=2 5 101
-  ADMUX    = 0b11000101;// 0b11000101 Disable Left-Adjust and select Internal 1.1V reference and
-                //ADC Channel 5 '0101' as input (0 '0000') p265
+  // Select Vref=AVcc
+  ADMUX |= (1<<REFS0);
+  //set prescaller to 128 and enable ADC 
+  ADCSRA |= (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0)|(1<<ADEN);
+
+
   compare  = (unsigned int)THRESHOLD;// (465 -> 0.5V Equivalent Counts for 1.1 V ADC Reference)
 }//initialize
+
+uint16_t ADC_read(uint8_t ADCchannel)
+{
+ //select ADC channel with safety mask
+ ADMUX = (ADMUX & 0xF0) | (ADCchannel & 0x0F);
+ //single conversion mode
+ ADCSRA |= (1<<ADSC);
+ // wait until ADC conversion is complete
+ while( ADCSRA & (1<<ADSC) );
+ return ADC;
+}
 
 /*! \brief ADC Conversion Routine
  *  in single ended mode */
 void convert(void)
 {
-  ADCSRA  |= (1<<ADSC);			// Start ADC Conversion
-  while((ADCSRA & (1<<ADIF)) != 0x10);	// Wait till conversion is complete
-  result   = ADC;                       // Read the ADC Result
-  ADCSRA  |= (1 << ADIF);		// Clear ADC Conversion Interrupt Flag
-  if(result <= compare)                 // Compare the converted result with 0.5 V
-//  if(result > compare)                 // Compare the converted result with 0.5 V
+  result=ADC_read(5);
+
+  if(result > compare)                 // Compare the converted result with 0.5 V
     LED_PORT|=_BV(LED_BR);//LED on
   else
     LED_PORT&=~_BV(LED_BR);//LED off
@@ -177,7 +184,7 @@ int main(void)
 #define ADC_ENABLE
 
 #ifdef ADC_ENABLE
-initialize();
+ADC_init();
 #endif
 
 //mapping
@@ -199,10 +206,6 @@ initialize();
 #endif
 //  testAllLED(1,1000,led);
 /**/
-
-#ifdef ADC_ENABLE
-_delay_ms(20000);//test: wait a while for ADC ready ?
-#endif
 
 //loop
   int delay=234;
