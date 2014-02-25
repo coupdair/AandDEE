@@ -22,17 +22,17 @@
 #define LED_DDR  DDRB
 #define LED_PORT PORTB
 //Upper Left LED
-#define LED_UL  PORTB5
+#define LED_UL  PORTB2
 //Upper Right LED
-#define LED_UR  PORTB2
+#define LED_UR  PORTB1
 //Bottom Left LED
-#define LED_BL  PORTB4
+#define LED_BL  PORTB0
 //Bottom Right LED
-#define LED_BR  PORTB0
+#define LED_BR  PORTB3
 //Analog Left LED
-#define LED_AL  PORTB1
+#define LED_AL  PORTB5
 //Analog Right LED
-#define LED_AR  PORTB3
+#define LED_AR  PORTB4
 
 //4 TTL on single port
 #define TTL_DDR  DDRD 
@@ -140,16 +140,30 @@ int main(void)
   int led[6]={LED_UL,LED_UR,LED_BL,LED_BR,LED_AL,LED_AR};
 
 //test
-/**/
+/** /
   testAllLED(2,500,led);
   testLEDmap(2,500,led,ttl);
   testAllLED(1,1000,led);
 /**/
 
 //loop
+  int delay=1234;
   while(1)
   {
-    testAllLED(1,321,led);
+testAllLED(1,500,led);
+testLEDmap(1,500,led,ttl);
+/*
+    //ON
+    LED_PORT|=_BV(LED_UL);//LED on
+    _delay_ms(delay);
+    LED_PORT|=_BV(LED_BL);//LED on
+    _delay_ms(delay);
+    //OFF
+    LED_PORT&=~_BV(LED_UL);//LED off
+    _delay_ms(delay);
+    LED_PORT&=~_BV(LED_BL);//LED off
+    _delay_ms(delay);
+*/
   }//infinite loop
   return (0);
 }
