@@ -124,8 +124,6 @@ void testLEDmap(int repeat,int delay,int *led/*[6]*/,int *ttl/*[4]*/)
 unsigned int result;
 unsigned int compare;
 
-/*! \brief Initializes ADC Peripheral
-     Configuration Registers */
 void ADC_init(void)
 {
   // Select Vref=AVcc
@@ -133,9 +131,8 @@ void ADC_init(void)
   //set prescaller to 128 and enable ADC 
   ADCSRA |= (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0)|(1<<ADEN);
 
-
   compare  = (unsigned int)THRESHOLD;// (465 -> 0.5V Equivalent Counts for 1.1 V ADC Reference)
-}//initialize
+}//ADC_init
 
 uint16_t ADC_read(uint8_t ADCchannel)
 {
@@ -146,10 +143,8 @@ uint16_t ADC_read(uint8_t ADCchannel)
  // wait until ADC conversion is complete
  while( ADCSRA & (1<<ADSC) );
  return ADC;
-}
+}//ADC_read
 
-/*! \brief ADC Conversion Routine
- *  in single ended mode */
 void convert(void)
 {
   result=ADC_read(5);
