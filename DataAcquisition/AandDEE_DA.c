@@ -52,7 +52,8 @@
 //AIN: A0-5 <=> C0-5
 #define AIN 5
 //threshold 5V = 10 bit = 1024
-#define THRESHOLD 465
+//threshold 1.1V = 10 bit = 1024
+#define THRESHOLD 256
 
 #endif
 
@@ -150,9 +151,15 @@ void convert(void)
   result=ADC_read(5);
 
   if(result > compare)                 // Compare the converted result with 0.5 V
+  {
+    TTL_PORT|=_BV(TTL_UL);//TTL on
     LED_PORT|=_BV(LED_BR);//LED on
+  }
   else
+  {
+    TTL_PORT&=~_BV(TTL_UL);//TTL off
     LED_PORT&=~_BV(LED_BR);//LED off
+  }
 }//convert
 
 //
@@ -215,14 +222,20 @@ LED_PORT&=~_BV(LED_UR);//LED off
 #else
     // D  test
     if( bit_is_set(TTL_PIN,TTL_BL) )
+    {
+      TTL_PORT|=_BV(TTL_UL);//TTL on
       LED_PORT|=_BV(LED_BR);//LED on
+    }
     else
+    {
+      TTL_PORT&=~_BV(TTL_UL);//TTL on
       LED_PORT&=~_BV(LED_BR);//LED off
+    }
 #endif
 LED_PORT&=~_BV(LED_UL);//LED off
 LED_PORT|=_BV(LED_UR);//LED on
     //wait for next ADConvertion, so lighting LED could be seen.
-    _delay_ms(delay);
+//    _delay_ms(delay);
   }//infinite loop
   return (0);
 }
