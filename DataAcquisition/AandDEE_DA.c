@@ -135,10 +135,13 @@ void ADC_init(void)
   compare  = (unsigned int)THRESHOLD;// (465 -> 0.5V Equivalent Counts for 1.1 V ADC Reference)
 }//ADC_init
 
-uint16_t ADC_read(uint8_t ADCchannel)
+uint16_t ADC_read(void)
+{
+/*(uint8_t ADCchannel)
 {
  //select ADC channel with safety mask
  ADMUX = (ADMUX & 0xF0) | (ADCchannel & 0x0F);
+*/
  //single conversion mode
  ADCSRA |= (1<<ADSC);
  // wait until ADC conversion is complete
@@ -148,17 +151,17 @@ uint16_t ADC_read(uint8_t ADCchannel)
 
 void convert(void)
 {
-  result=ADC_read(5);
+  result=ADC_read();//(5);
 
   if(result > compare)                 // Compare the converted result with 0.5 V
   {
     TTL_PORT|=_BV(TTL_UL);//TTL on
-    LED_PORT|=_BV(LED_BR);//LED on
+//    LED_PORT|=_BV(LED_BR);//LED on
   }
   else
   {
     TTL_PORT&=~_BV(TTL_UL);//TTL off
-    LED_PORT&=~_BV(LED_BR);//LED off
+//    LED_PORT&=~_BV(LED_BR);//LED off
   }
 }//convert
 
@@ -212,10 +215,16 @@ ADC_init();
 //loop
   int delay=234;
 LED_PORT|=_BV(LED_BL);//LED on
+
+ //select ADC channel with safety mask
+ ADMUX = (ADMUX & 0xF0) | (AIN & 0x0F);
+
   while(1)
   {
+/*
 LED_PORT|=_BV(LED_UL);//LED on
 LED_PORT&=~_BV(LED_UR);//LED off
+*/
     //ADC test
 #ifdef ADC_ENABLE
     convert();
@@ -232,8 +241,10 @@ LED_PORT&=~_BV(LED_UR);//LED off
       LED_PORT&=~_BV(LED_BR);//LED off
     }
 #endif
+/*
 LED_PORT&=~_BV(LED_UL);//LED off
 LED_PORT|=_BV(LED_UR);//LED on
+*/
     //wait for next ADConvertion, so lighting LED could be seen.
 //    _delay_ms(delay);
   }//infinite loop
