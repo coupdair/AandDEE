@@ -172,7 +172,8 @@ int main(void)
 ///TTL
 /**/
   TTL_DDR|=_BV(TTL_UL);//TTL output
-  TTL_DDR|=_BV(TTL_UR);//TTL output
+//  TTL_DDR|=_BV(TTL_UR);//TTL output
+  TTL_DDR&=~_BV(TTL_UR);//TTL input
   TTL_DDR|=_BV(TTL_BR);//TTL output
 //  TTL_DDR|=_BV(TTL_BL);//TTL output
   TTL_DDR&=~_BV(TTL_BL);//TTL input
@@ -186,7 +187,7 @@ int main(void)
   LED_DDR|=_BV(LED_BL)|_BV(LED_BR)|_BV(LED_UL)|_BV(LED_UR);//LED output
 
 //ADC
-#define ADC_ENABLE
+//#define ADC_ENABLE
 
 #ifdef ADC_ENABLE
 ADC_init();
@@ -207,7 +208,7 @@ ADC_init();
 /**/
   testAllLED(2,500,led);
 #ifndef ADC_ENABLE
-  testLEDmap(2,500,led,ttl);
+//  testLEDmap(2,500,led,ttl);
 #endif
 //  testAllLED(1,1000,led);
 /**/
@@ -216,8 +217,10 @@ ADC_init();
   int delay=234;
 LED_PORT|=_BV(LED_BL);//LED on
 
+#ifdef ADC_ENABLE
  //select ADC channel with safety mask
  ADMUX = (ADMUX & 0xF0) | (AIN & 0x0F);
+#endif
 
   while(1)
   {
@@ -230,7 +233,7 @@ LED_PORT&=~_BV(LED_UR);//LED off
     convert();
 #else
     // D  test
-    if( bit_is_set(TTL_PIN,TTL_BL) )
+    if( bit_is_set(TTL_PIN,TTL_UR) )
     {
       TTL_PORT|=_BV(TTL_UL);//TTL on
       LED_PORT|=_BV(LED_BR);//LED on
